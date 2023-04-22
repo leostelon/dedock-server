@@ -1,0 +1,13 @@
+version: '0.1'
+services:
+  registry:
+    image: registry:2
+    ports:
+      - 5000:5000
+  node:
+    image: node-server:latest
+    ports:
+      - 3000:3000
+    build:
+      context: .
+      dockerfile: Dockerfile
