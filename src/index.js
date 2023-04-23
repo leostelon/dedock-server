@@ -1,4 +1,10 @@
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
+
+require("dotenv").config({
+	path: path.join(__dirname, "../.env"),
+});
 
 const app = express();
 

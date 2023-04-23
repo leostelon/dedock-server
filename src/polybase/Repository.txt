@@ -1,0 +1,16 @@
+@public
+collection Repository {
+  id: string;
+  name: string;
+  tag: string;
+  creator: string;
+  timestamp: number;
+
+  constructor(name:string, tag:string, creator:string) {
+    this.id = name + ":" + tag;
+    this.name = name;
+    this.tag = tag;
+    this.creator = creator;
+    this.timestamp = Date.now();
+  }
+}
