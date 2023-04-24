@@ -9,12 +9,14 @@ require("dotenv").config({
 
 // Database
 require("./polybase");
-
 const app = express();
+app.use(express.static(__dirname));
+
+// Routes
 app.use(routes);
 
 app.get("/", (req, res) => {
-	res.send({ message: "Welcome to my app." });
+	res.send({ message: "Dedock server⚡" });
 });
 
 app.listen(3000, () => {
