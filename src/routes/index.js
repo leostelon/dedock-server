@@ -1,8 +1,10 @@
 const router = require("express").Router();
-const repository = require("./upload");
+const cli = require("./cli");
+const repository = require("./repository");
 const user = require("./user");
 
-router.use(repository);
+router.use(cli);
 router.use(user);
+router.use(repository)
 
 module.exports = router;
