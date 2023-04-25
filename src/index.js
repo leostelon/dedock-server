@@ -1,16 +1,32 @@
-const fs = require("fs");
 const path = require("path");
-const express = require("express");
-const routes = require("./routes");
-
+// Import env
 require("dotenv").config({
 	path: path.join(__dirname, "../.env"),
 });
 
-// Database
-require("./polybase");
+const express = require("express");
+const routes = require("./routes");
+
 const app = express();
 app.use(express.static(__dirname));
+
+// Database
+require("./polybase");
+
+// CORS
+app.use(function (req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.header(
+		"Access-Control-Allow-Methods",
+		" GET, POST, PATCH, PUT, DELETE, OPTIONS"
+	);
+	res.header(
+		"Access-Control-Allow-Headers",
+		"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+	);
+	next();
+});
+app.use(express.json());
 
 // Routes
 app.use(routes);
