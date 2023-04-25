@@ -1,19 +1,26 @@
+const fs = require("fs")
 const path = require("path");
 const router = require("express").Router();
-const { SpheronClient, ProtocolEnum } = require("@spheron/storage");
+const { auth } = require("../middlewares/auth");
 const { upload } = require("../middlewares/multer");
-const token = "your-token";
+const { SpheronClient, ProtocolEnum } = require("@spheron/storage");
 
+const token = process.env.SPHERON_TOKEN;
 const client = new SpheronClient({ token });
+
 router.post(
 	"/upload",
-	upload.single("image"),
+	auth,
+	upload.single("file"),
 	async (req, res) => {
 		try {
 			if (!req.file) {
 				return res.send({ message: "Send file" });
 			}
 			const file = req.file;
+			const image = req.body.image;
+
+			// Upload to polybase
 
 			// Upload to Spheron
 			const filePath = path.join(__dirname, "../../uploads/" + file.filename);
