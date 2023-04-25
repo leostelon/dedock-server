@@ -31,7 +31,6 @@ router.post(
 			} catch (err) { }
 
 			if (!repoImage) {
-				console.log("enter")
 				// Upload to Spheron
 				const filePath = path.join(__dirname, "../../uploads/" + file.filename);
 				const response = await client.upload(filePath, {
@@ -64,6 +63,28 @@ router.post(
 		console.log(err);
 		res.status(400).send({ error: err.message });
 	}
+);
+
+router.get(
+	"/pull/:image",
+	async (req, res) => {
+		try {
+			const image = req.params.image;
+			const tag = image.split(":").pop();
+			const name = image.split(":").slice(0, -1).join(":")
+			if (!tag || !name) return res.status(500).send({ message: "Please specify proper image name with tag." });
+
+			let repoImage = await repositoryReference
+				.record(image).get();
+
+			if (!repoImage) return res.status(404).send({ message: "Repository not found with the given name and tag." });
+
+			res.send(repoImage);
+		} catch (error) {
+			console.log(error);
+			res.status(500).send({ message: error.message });
+		}
+	},
 );
 
 router.get("/spheronfileuploadcheck", async (req, res) => {
