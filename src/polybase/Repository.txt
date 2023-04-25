@@ -4,12 +4,14 @@ collection Repository {
   name: string;
   tag: string;
   creator: string;
+  image: string;
   timestamp: number;
 
-  constructor(name:string, tag:string, creator:string) {
+  constructor(name:string, tag:string, image: string, creator:string) {
     this.id = name + ":" + tag;
     this.name = name;
     this.tag = tag;
+    this.image = image;
     this.creator = creator;
     this.timestamp = Date.now();
   }

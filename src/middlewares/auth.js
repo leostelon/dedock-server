@@ -14,7 +14,7 @@ async function auth(req, res, next) {
         if (!user) {
             throw new Error();
         }
-        req.user = user;
+        req.user = user.data[0].data;
         next();
     } catch (e) {
         res

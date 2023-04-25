@@ -4,9 +4,11 @@ const router = require("express").Router();
 const { auth } = require("../middlewares/auth");
 const { upload } = require("../middlewares/multer");
 const { SpheronClient, ProtocolEnum } = require("@spheron/storage");
+const { db } = require("../polybase");
 
 const token = process.env.SPHERON_TOKEN;
 const client = new SpheronClient({ token });
+const repositoryReference = db.collection("Repository");
 
 router.post(
 	"/upload",
@@ -19,28 +21,40 @@ router.post(
 			}
 			const file = req.file;
 			const image = req.body.image;
+			const tag = image.split(":").pop();
+			const name = image.split(":").slice(0, -1).join(":")
 
-			// Upload to polybase
+			let repoImage;
+			try {
+				repoImage = await repositoryReference
+					.record(image).get();
+			} catch (err) { }
 
-			// Upload to Spheron
-			const filePath = path.join(__dirname, "../../uploads/" + file.filename);
-			const response = await client.upload(filePath, {
-				protocol: ProtocolEnum.IPFS,
-				name: "testbucketspriyo",
-				onUploadInitiated: (uploadId) => {
-					console.log(`Upload with id ${uploadId} started...`);
-				},
-				onChunkUploaded: (uploadedSize, totalSize) => {
-					let currentlyUploaded;
-					currentlyUploaded += uploadedSize;
-					console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
-				},
-			});
+			if (!repoImage) {
+				console.log("enter")
+				// Upload to Spheron
+				const filePath = path.join(__dirname, "../../uploads/" + file.filename);
+				const response = await client.upload(filePath, {
+					protocol: ProtocolEnum.IPFS,
+					name: "testbucketspriyo",
+					onUploadInitiated: (uploadId) => {
+						console.log(`Upload with id ${uploadId} started...`);
+					},
+					onChunkUploaded: (uploadedSize, totalSize) => {
+						let currentlyUploaded;
+						currentlyUploaded += uploadedSize;
+						console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+					},
+				});
+
+				// Upload to polybase
+				repoImage = await repositoryReference.create([name, tag, response.protocolLink, req.user.id])
+			}
 
 			// Delete File
 			fs.rmSync(`${file.destination}/${file.filename}`);
 
-			res.send(response);
+			res.send(repoImage);
 		} catch (error) {
 			console.log(error);
 			res.status(500).send({ message: error.message });
