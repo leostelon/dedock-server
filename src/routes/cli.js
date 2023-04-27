@@ -24,10 +24,13 @@ router.post(
 			const tag = image.split(":").pop();
 			const name = image.split(":").slice(0, -1).join(":")
 
+			// Check if username is updated
+			if (!req.user.updatedUsername) return res.status(401).send({ message: "Please update you username." });
+
 			let repoImage;
 			try {
 				repoImage = await repositoryReference
-					.record(image).get();
+					.record(`${res.user.username}/${image}`).get();
 			} catch (err) { }
 
 			if (!repoImage) {
@@ -47,7 +50,7 @@ router.post(
 				});
 
 				// Upload to polybase
-				repoImage = await repositoryReference.create([name, tag, response.protocolLink, req.user.id])
+				repoImage = await repositoryReference.create([`${req.user.username}/${name}`, tag, response.protocolLink, req.user.id])
 			}
 
 			// Delete File
@@ -66,22 +69,36 @@ router.post(
 );
 
 router.get(
-	"/pull/:image",
+	"/pull",
 	async (req, res) => {
 		try {
-			const image = req.params.image;
-			const tag = image.split(":").pop();
-			const name = image.split(":").slice(0, -1).join(":")
-			if (!tag || !name) return res.status(500).send({ message: "Please specify proper image name with tag." });
+			const image = req.query.image;
+			if (!image) return res.send({ message: "Please specify image name." })
+			let tag;
+			let name;
+			if (image.includes(":")) {
+				tag = image.split(":").pop();
+				name = image.split(":").slice(0, -1).join(":")
+			} else {
+				name = image;
+			}
+			if (!name) return res.status(500).send({ message: "Please specify proper image name with tag." });
 
-			let repoImage = await repositoryReference
-				.record(image).get();
+			let repoImage
+			if (!tag) {
+				const repos = await repositoryReference
+					// .sort("timestamp", "desc")
+					.where("name", "==", name).limit(1).get();
+				repoImage = repos.data[0]
+			} else {
+				repoImage = await repositoryReference
+					.record(image).get();
+			}
 
-			if (!repoImage) return res.status(404).send({ message: "Repository not found with the given name and tag." });
+			if (!repoImage) return res.status(404).send({ message: "Repository not found with the given name." });
 
 			res.send(repoImage);
 		} catch (error) {
-			console.log(error);
 			res.status(500).send({ message: error.message });
 		}
 	},

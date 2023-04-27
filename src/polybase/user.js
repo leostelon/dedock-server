@@ -41,4 +41,17 @@ const createUser = async function (address) {
     }
 }
 
-module.exports = { createToken, createUser }
+const getUser = async function (address) {
+    try {
+        let user;
+        try {
+            user = await collectionReference
+                .record(address).get();
+        } catch (err) { }
+        return user;
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+module.exports = { createToken, createUser, getUser }

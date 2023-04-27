@@ -6,7 +6,10 @@ collection Repository {
   creator: string;
   image: string;
   timestamp: number;
+  private: boolean;
 
+  @index(timestamp);
+  
   constructor(name:string, tag:string, image: string, creator:string) {
     this.id = name + ":" + tag;
     this.name = name;
@@ -14,5 +17,10 @@ collection Repository {
     this.image = image;
     this.creator = creator;
     this.timestamp = Date.now();
+    this.private = false;
+  }
+
+  makePrivate() {
+    this.private = true;
   }
 }
