@@ -15,7 +15,11 @@ require("./polybase");
 
 // CORS
 app.use(function (req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
+	var allowedDomains = process.env.ALLOWED_DOMAINS.split(" ");
+	var origin = req.headers.origin;
+	if (allowedDomains.indexOf(origin) > -1) {
+		res.setHeader("Access-Control-Allow-Origin", origin);
+	}
 	res.header(
 		"Access-Control-Allow-Methods",
 		" GET, POST, PATCH, PUT, DELETE, OPTIONS"
