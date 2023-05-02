@@ -38,6 +38,18 @@ router.post("/user/username", auth, async (req, res) => {
     }
 })
 
+router.get("/user/enablepremium", auth, async (req, res) => {
+    try {
+        const response = await collectionReference
+            .record(req.user.id)
+            .call("updatePremium", []);
+
+        res.send(response.data)
+    } catch (error) {
+        res.status(500).send({ message: error.message })
+    }
+})
+
 router.get("/user/:address", async (req, res) => {
     try {
         const { address } = req.params;
