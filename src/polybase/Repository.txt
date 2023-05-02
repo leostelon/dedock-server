@@ -9,6 +9,8 @@ collection Repository {
   private: boolean;
 
   @index(timestamp);
+  @index(private, creator);
+  @index(name, timestamp);
   
   constructor(name:string, tag:string, image: string, creator:string) {
     this.id = name + ":" + tag;

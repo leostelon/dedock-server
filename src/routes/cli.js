@@ -88,8 +88,9 @@ router.get(
 			let repoImage
 			if (!tag) {
 				const repos = await repositoryReference
-					// .sort("timestamp", "desc")
-					.where("name", "==", name).limit(1).get();
+					.where("name", "==", name)
+					.sort("timestamp", "desc")
+					.limit(1).get();
 				repoImage = repos.data[0]
 				if (repoImage.data.private) {
 					if (req.user) {
