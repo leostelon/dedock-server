@@ -7,11 +7,13 @@ collection User {
   username?: string;
   token?: string;
   updatedUsername:boolean;
+  premium:boolean;
 
   constructor (id: string) {
     this.id = id;
     this.name = id;
     this.updatedUsername = false;
+    this.premium = false;
     this.publicKey = ctx.publicKey;
   }
 
@@ -25,5 +27,9 @@ collection User {
      }
      this.username = name;
      this.updatedUsername = true;
+  }
+
+  updatePremium() {
+     this.premium = true;
   }
 }

@@ -5,6 +5,7 @@ const { auth } = require("../middlewares/auth");
 const { upload } = require("../middlewares/multer");
 const { SpheronClient, ProtocolEnum } = require("@spheron/storage");
 const { db } = require("../polybase");
+const getUser = require("../middlewares/getUser");
 
 const token = process.env.SPHERON_TOKEN;
 const client = new SpheronClient({ token });
@@ -69,7 +70,7 @@ router.post(
 );
 
 router.get(
-	"/pull",
+	"/pull", getUser,
 	async (req, res) => {
 		try {
 			const image = req.query.image;
@@ -87,12 +88,27 @@ router.get(
 			let repoImage
 			if (!tag) {
 				const repos = await repositoryReference
-					// .sort("timestamp", "desc")
-					.where("name", "==", name).limit(1).get();
+					.where("name", "==", name)
+					.sort("timestamp", "desc")
+					.limit(1).get();
 				repoImage = repos.data[0]
+				if (repoImage.data.private) {
+					if (req.user) {
+						if (repoImage.data.creator !== req.user.id) return res.status(401).send({ message: "Unauthorized!" });
+					} else {
+						return res.status(401).send({ message: "Unauthorized!" });
+					}
+				}
 			} else {
 				repoImage = await repositoryReference
 					.record(image).get();
+				if (repoImage.data.private) {
+					if (req.user) {
+						if (repoImage.data.creator !== req.user.id) return res.status(401).send({ message: "Unauthorized!" });
+					} else {
+						return res.status(401).send({ message: "Unauthorized!" });
+					}
+				}
 			}
 
 			if (!repoImage) return res.status(404).send({ message: "Repository not found with the given name." });
