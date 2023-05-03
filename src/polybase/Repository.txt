@@ -11,6 +11,7 @@ collection Repository {
   @index(timestamp);
   @index(private, creator);
   @index(name, timestamp);
+  @index(private, timestamp);
   
   constructor(name:string, tag:string, image: string, creator:string) {
     this.id = name + ":" + tag;

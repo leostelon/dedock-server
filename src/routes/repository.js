@@ -7,7 +7,7 @@ const repositoryReference = db.collection("Repository");
 
 router.get("/repository", async (req, res) => {
     try {
-        const rep = await repositoryReference.limit(20).where("private", "==", false).get();
+        const rep = await repositoryReference.sort("timestamp", "desc").where("private", "==", false).limit(20).get();
         res.send({ repositories: rep.data })
     } catch (error) {
         res.status(500).send({ message: error.message })
