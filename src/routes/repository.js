@@ -38,18 +38,18 @@ router.post("/repository/public", auth, async (req, res) => {
     }
 })
 
-router.get("/repository/:name", getUser, async (req, res) => {
+router.get("/repository", getUser, async (req, res) => {
     try {
-        const rep = await repositoryReference.where("id", "==", req.params.name).get();
+        const rep = await repositoryReference.where("id", "==", req.query.name).get();
         res.send({ repositories: rep.data })
     } catch (error) {
         res.status(500).send({ message: error.message })
     }
 })
 
-router.get("/repository/tags/:name", async (req, res) => {
+router.get("/repository/tags", async (req, res) => {
     try {
-        const rep = await repositoryReference.where("name", "==", req.params.name).get();
+        const rep = await repositoryReference.where("name", "==", req.query.name).get();
         res.send({ repositories: rep.data })
     } catch (error) {
         res.status(500).send({ message: error.message })
