@@ -47,9 +47,14 @@ router.get("/repository", getUser, async (req, res) => {
     }
 })
 
-router.get("/repository/tags", async (req, res) => {
+router.get("/repository/tags", getUser, async (req, res) => {
     try {
-        const rep = await repositoryReference.where("name", "==", req.query.name).get();
+        let rep;
+        if (req.user) {
+            rep = await repositoryReference.where("name", "==", req.query.name).get();
+        } else {
+            rep = await repositoryReference.where("private", "==", false).where("name", "==", req.query.name).get();
+        }
         res.send({ repositories: rep.data })
     } catch (error) {
         res.status(500).send({ message: error.message })
@@ -60,7 +65,7 @@ router.get("/repository/user/:creator", getUser, async (req, res) => {
     try {
         let rep;
         if (req.user) {
-            rep = await repositoryReference.where("creator", "==", req.params.creator).get();
+            rep = await repositoryReference.where("private", "==", true).where("creator", "==", req.params.creator).get();
         } else {
             rep = await repositoryReference.where("private", "==", false).where("creator", "==", req.params.creator).get();
         }
