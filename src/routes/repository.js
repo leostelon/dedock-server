@@ -52,6 +52,12 @@ router.get("/repository/tags", getUser, async (req, res) => {
         let rep;
         if (req.user) {
             rep = await repositoryReference.where("name", "==", req.query.name).get();
+            if (rep.data.length >= 1) {
+                const repoImage = rep.data[0];
+                if (repoImage.data.creator !== req.user.id) {
+                    rep = await repositoryReference.where("name", "==", req.query.name).where("private", "==", false).get();
+                }
+            }
         } else {
             rep = await repositoryReference.where("name", "==", req.query.name).where("private", "==", false).get();
         }
@@ -66,6 +72,12 @@ router.get("/repository/user/:creator", getUser, async (req, res) => {
         let rep;
         if (req.user) {
             rep = await repositoryReference.where("creator", "==", req.params.creator).get();
+            if (rep.data.length >= 1) {
+                const repoImage = rep.data[0];
+                if (repoImage.data.creator !== req.user.id) {
+                    rep = await repositoryReference.where("private", "==", false).where("creator", "==", req.params.creator).get();
+                }
+            }
         } else {
             rep = await repositoryReference.where("private", "==", false).where("creator", "==", req.params.creator).get();
         }
