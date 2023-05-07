@@ -53,7 +53,7 @@ router.get("/repository/tags", getUser, async (req, res) => {
         if (req.user) {
             rep = await repositoryReference.where("name", "==", req.query.name).get();
         } else {
-            rep = await repositoryReference.where("private", "==", false).where("name", "==", req.query.name).get();
+            rep = await repositoryReference.where("name", "==", req.query.name).where("private", "==", false).get();
         }
         res.send({ repositories: rep.data })
     } catch (error) {
@@ -65,7 +65,7 @@ router.get("/repository/user/:creator", getUser, async (req, res) => {
     try {
         let rep;
         if (req.user) {
-            rep = await repositoryReference.where("private", "==", true).where("creator", "==", req.params.creator).get();
+            rep = await repositoryReference.where("creator", "==", req.params.creator).get();
         } else {
             rep = await repositoryReference.where("private", "==", false).where("creator", "==", req.params.creator).get();
         }
